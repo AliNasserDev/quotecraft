@@ -1,0 +1,5 @@
+.vercel/
+work/
+outputs/
+*.log
+
