@@ -3,3 +3,7 @@
 work/
 outputs/
 README.md
+.env.example
+PAYMENTS-UAE.md
+supabase/
+tests/
