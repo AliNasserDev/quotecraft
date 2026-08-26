@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Create polished, client-ready project quotes in minutes.">
+  <meta name="description" content="Create polished, client-ready project quotes in minutes with QuoteCraft.">
   <meta name="theme-color" content="#174c36">
   <meta property="og:type" content="website">
   <meta property="og:title" content="QuoteCraft — quotes that close">
@@ -12,79 +12,153 @@
   <meta name="twitter:title" content="QuoteCraft — quotes that close">
   <meta name="twitter:description" content="Build polished, client-ready project quotes in minutes.">
   <title>QuoteCraft — quotes that close</title>
-  <style>
-    :root{--ink:#172019;--muted:#687269;--paper:#fffef9;--line:#dce3d9;--green:#174c36;--green2:#226447;--lime:#c4f879;--lime-soft:#eafbd0;--danger:#a63832;--shadow:0 20px 60px #1c34241a;--radius:22px}
-    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;color:var(--ink);background:radial-gradient(circle at 12% -10%,#c4f87957,transparent 30rem),#f5f7f2;font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}button,input,textarea,select{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid #428b5d4d;outline-offset:2px}[hidden]{display:none!important}
-    .app{max-width:1460px;margin:auto;padding:18px 24px 48px}.topbar{min-height:66px;display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:22px}.brand{display:flex;align-items:center;gap:11px;font-weight:850;font-size:19px;letter-spacing:-.45px}.brand-mark{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;background:var(--green);color:var(--lime)}.top-actions{display:flex;align-items:center;gap:9px}.save-state{margin-right:5px;font-size:12px;color:var(--muted)}.save-state:before{content:"";width:7px;height:7px;border-radius:50%;background:#68a478;display:inline-block;margin-right:6px}
-    .button{border:1px solid transparent;border-radius:11px;padding:10px 14px;background:#fff;color:var(--ink);font-weight:760;transition:.16s ease}.button:hover{transform:translateY(-1px)}.button.ghost{border-color:var(--line);background:#ffffffb3}.button.primary{background:var(--green);color:#fff}.button.primary:hover{background:var(--green2)}.button.accent{background:var(--lime);color:#173a26}.button.small{padding:7px 10px;border-radius:9px;font-size:12px}.button.icon{width:36px;height:36px;padding:0;display:grid;place-items:center;color:var(--muted)}.button.danger{color:var(--danger)}
-    .workspace{display:grid;grid-template-columns:minmax(530px,.95fr) minmax(500px,1.05fr);gap:22px;align-items:start}.panel{background:#ffffffde;border:1px solid #d6e0d3f2;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}.builder{min-width:0}.builder-head{padding:25px 27px 18px;border-bottom:1px solid var(--line);display:flex;align-items:flex-start;justify-content:space-between;gap:16px}.eyebrow{color:#4c805f;font-size:10px;letter-spacing:1.8px;font-weight:850;text-transform:uppercase}h1,h2,h3,p{margin-top:0}.builder-head h1{margin:4px 0;font-size:28px;line-height:1.15;letter-spacing:-1.1px}.builder-head p{margin:0;color:var(--muted);font-size:13px}.status-select{width:auto;min-width:108px;padding-right:30px;background-color:var(--lime-soft);color:var(--green);font-weight:800;border-color:#cce9ae}
-    .form-section{padding:21px 27px;border-bottom:1px solid var(--line)}.form-section:last-child{border-bottom:0}.section-title{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:14px}.section-title h2{margin:0;font-size:14px}.section-title span{color:var(--muted);font-size:11px}.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.field-grid.three{grid-template-columns:1.3fr .7fr .8fr}.field{min-width:0}.field.full{grid-column:1/-1}label{display:block;margin-bottom:5px;color:var(--muted);font-size:11px;font-weight:750}input,textarea,select{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 11px;color:var(--ink);background:#fbfcf9;outline:none;transition:.15s ease}textarea{resize:vertical;min-height:72px}input:focus,textarea:focus,select:focus{border-color:#75a786;box-shadow:0 0 0 3px #4c805f1c;background:#fff}
-    .items{display:grid;gap:8px}.item-row{display:grid;grid-template-columns:minmax(150px,1fr) 60px 100px 96px 36px;gap:8px;align-items:center}.item-head{color:var(--muted);font-size:10px;font-weight:750;padding:0 2px}.item-head span:nth-child(n+2){text-align:right}.item-row input{padding:9px}.item-row input[type=number]{text-align:right}.item-total{text-align:right;font-size:12px;font-weight:800;white-space:nowrap}.add-item{margin-top:10px;color:var(--green);background:transparent;border:0;padding:5px 0;font-weight:800;font-size:12px}.totals-fields{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.action-row{display:flex;gap:9px;align-items:center}.action-row .primary{flex:1;padding:12px 16px}
-    .preview-wrap{position:sticky;top:18px;min-width:0}.preview-toolbar{display:flex;justify-content:space-between;align-items:center;margin:0 4px 11px}.preview-toolbar strong{font-size:12px}.preview-toolbar span{color:var(--muted);font-size:11px}.document{background:var(--paper);border:1px solid #dde3d8;border-radius:24px;box-shadow:0 24px 70px #1b342221;overflow:hidden;min-height:760px}.doc-accent{height:9px;background:var(--green)}.doc-inner{padding:44px 48px 40px}.doc-header{display:flex;justify-content:space-between;gap:28px;margin-bottom:50px}.doc-brand{display:flex;align-items:center;gap:11px}.doc-logo{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:var(--green);color:var(--lime);font-size:18px;font-weight:900}.doc-brand strong{display:block;font-size:16px}.doc-brand small{display:block;color:var(--muted)}.doc-meta{text-align:right;font-size:12px;color:var(--muted)}.doc-meta strong{display:block;color:var(--ink);font-size:14px;margin-bottom:4px}.doc-title{margin-bottom:34px}.doc-title h2{font-size:clamp(31px,3vw,45px);line-height:1.05;letter-spacing:-2px;margin:8px 0 11px}.prepared{color:var(--muted)}.prepared strong{color:var(--ink)}.scope{margin:0 0 30px;color:#4f5c52;white-space:pre-wrap}
-    .doc-table{width:100%;border-collapse:collapse;margin-bottom:28px}.doc-table th{border-bottom:1px solid var(--ink);padding:8px 0;text-align:left;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}.doc-table td{border-bottom:1px solid var(--line);padding:14px 0;vertical-align:top}.doc-table th:nth-child(n+2),.doc-table td:nth-child(n+2){text-align:right}.doc-table td:first-child{font-weight:700}.summary{margin-left:auto;width:min(300px,100%)}.summary-line{display:flex;justify-content:space-between;gap:24px;padding:6px 0;color:var(--muted);font-size:12px}.summary-line strong{color:var(--ink)}.summary-line.total{border-top:1px solid var(--ink);margin-top:6px;padding-top:13px;color:var(--ink);font-size:15px;font-weight:800}.summary-line.total strong{font-size:23px;letter-spacing:-.7px}.deposit-card{margin-top:28px;background:var(--green);color:#fff;border-radius:17px;padding:20px 22px;display:flex;justify-content:space-between;align-items:center;gap:20px}.deposit-card small{color:#cfe0d2;display:block;margin-bottom:3px}.deposit-card strong{color:var(--lime);font-size:25px}.pay-link{color:var(--green);background:var(--lime);text-decoration:none;padding:10px 13px;border-radius:10px;font-size:12px;font-weight:850;white-space:nowrap}.doc-footer{margin-top:34px;padding-top:19px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:24px;color:var(--muted);font-size:11px}.doc-footer p{margin:0;max-width:430px}.doc-footer strong{color:var(--ink)}
-    .saved-drawer{position:fixed;inset:0;z-index:20;pointer-events:none}.saved-drawer.open{pointer-events:auto}.drawer-backdrop{position:absolute;inset:0;background:#0d191259;opacity:0;transition:.2s}.saved-drawer.open .drawer-backdrop{opacity:1}.drawer{position:absolute;right:0;top:0;bottom:0;width:min(430px,100%);background:#f8faf6;box-shadow:-20px 0 50px #11221726;transform:translateX(101%);transition:transform .24s ease;padding:24px;overflow:auto}.saved-drawer.open .drawer{transform:translateX(0)}.drawer-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}.drawer-head h2{margin:0;font-size:20px}.saved-list{display:grid;gap:10px}.saved-empty{border:1px dashed #cad4c6;border-radius:15px;padding:35px 20px;text-align:center;color:var(--muted)}.saved-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px}.saved-top{display:flex;justify-content:space-between;gap:12px}.saved-card h3{margin:0 0 3px;font-size:14px}.saved-card p{margin:0;color:var(--muted);font-size:11px}.saved-amount{font-weight:850;white-space:nowrap}.saved-actions{display:flex;gap:7px;margin-top:13px}.toast{position:fixed;left:50%;bottom:25px;z-index:40;transform:translate(-50%,20px);opacity:0;pointer-events:none;color:#fff;background:#17251b;padding:11px 16px;border-radius:999px;box-shadow:0 12px 30px #0003;transition:.2s ease;font-size:13px}.toast.show{opacity:1;transform:translate(-50%,0)}
-    @media(max-width:1050px){.workspace{grid-template-columns:1fr}.preview-wrap{position:static}.document{min-height:0}}@media(max-width:680px){.app{padding:12px 12px 30px}.save-state,.top-actions .accent{display:none}.builder-head,.form-section{padding:19px}.field-grid,.field-grid.three,.totals-fields{grid-template-columns:1fr 1fr}.item-row{grid-template-columns:1fr 54px 80px 34px}.item-row .item-total,.item-head span:nth-child(4){display:none}.doc-inner{padding:30px 24px}.doc-title h2{font-size:34px}.deposit-card{align-items:flex-start;flex-direction:column}.doc-footer{flex-direction:column}}@media print{@page{size:A4;margin:12mm}body{background:#fff}.app{max-width:none;padding:0}.topbar,.builder,.preview-toolbar,.toast,.saved-drawer{display:none!important}.workspace{display:block}.preview-wrap{position:static}.document{border:0;border-radius:0;box-shadow:none;min-height:auto}.doc-inner{padding:28px 34px}}
-  </style>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <script src="https://cdn.paddle.com/paddle/v2/paddle.js" defer></script>
+  <script src="app.js" defer></script>
 </head>
 <body>
   <main class="app">
-    <header class="topbar"><div class="brand"><span class="brand-mark">Q</span> QuoteCraft</div><div class="top-actions"><span class="save-state">Stored on this device</span><button class="button ghost" type="button" id="savedButton">Saved <span id="savedCount">0</span></button><button class="button accent" type="button" id="newButton">New quote</button></div></header>
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="QuoteCraft home"><span class="brand-mark">Q</span><span>QuoteCraft</span></a>
+      <nav class="top-actions" aria-label="Account and quote actions">
+        <button class="button ghost small" type="button" id="pricingButton">Pricing</button>
+        <span class="plan-pill" id="planPill">Free</span>
+        <button class="button ghost" type="button" id="savedButton">Saved <span id="savedCount">0</span></button>
+        <button class="button accent" type="button" id="newButton">New quote</button>
+        <button class="avatar-button" type="button" id="accountButton" aria-label="Open account"><span id="avatarInitial">?</span></button>
+      </nav>
+    </header>
+
+    <section class="launch-note" id="launchNote">
+      <div><strong>Your quote desk is ready.</strong> Sign in to keep quotes safely synced across devices.</div>
+      <button class="button small primary" type="button" data-open-auth>Sign in free</button>
+    </section>
+
     <section class="workspace">
       <form class="panel builder" id="quoteForm">
-        <div class="builder-head"><div><div class="eyebrow">Quote workspace</div><h1>Make the value obvious.</h1><p>Build a polished quote your client can say yes to.</p></div><select class="status-select" id="status" aria-label="Quote status"><option>Draft</option><option>Sent</option><option>Accepted</option></select></div>
-        <section class="form-section"><div class="section-title"><h2>Your brand</h2><span>Shown on the quote</span></div><div class="field-grid three"><div class="field"><label for="business">Business name</label><input id="business" value="Alex Morgan Studio"></div><div class="field"><label for="currency">Currency</label><select id="currency"><option>USD</option><option>EUR</option><option>GBP</option><option>AED</option><option>CAD</option><option>AUD</option></select></div><div class="field"><label for="number">Quote no.</label><input id="number" value="QC-1048"></div><div class="field full"><label for="email">Your email</label><input id="email" type="email" value="hello@alexmorgan.studio"></div></div></section>
-        <section class="form-section"><div class="section-title"><h2>Client & project</h2></div><div class="field-grid"><div class="field"><label for="client">Client / company</label><input id="client" value="Northstar Studio"></div><div class="field"><label for="project">Project name</label><input id="project" value="Brand refresh"></div><div class="field full"><label for="scope">Project scope</label><textarea id="scope">A focused brand refresh designed to sharpen recognition, build trust and give the team a consistent visual system.</textarea></div></div></section>
-        <section class="form-section"><div class="section-title"><h2>Services</h2><span>Itemize the value</span></div><div class="items" id="items"><div class="item-row item-head" aria-hidden="true"><span>Description</span><span>Qty</span><span>Rate</span><span>Amount</span><span></span></div></div><button class="add-item" id="addItem" type="button">+ Add another service</button></section>
-        <section class="form-section"><div class="section-title"><h2>Terms</h2><span>Set clear expectations</span></div><div class="totals-fields"><div class="field"><label for="discount">Discount %</label><input id="discount" type="number" min="0" max="100" value="0"></div><div class="field"><label for="tax">Tax %</label><input id="tax" type="number" min="0" max="100" step=".1" value="0"></div><div class="field"><label for="deposit">Deposit %</label><input id="deposit" type="number" min="0" max="100" value="50"></div><div class="field"><label for="validDays">Valid days</label><input id="validDays" type="number" min="1" max="365" value="14"></div></div><div class="field" style="margin-top:13px"><label for="paymentLink">Payment link <span style="font-weight:500">(optional)</span></label><input id="paymentLink" type="url" placeholder="https://buy.stripe.com/..."></div><div class="field" style="margin-top:13px"><label for="note">Client note</label><textarea id="note">Thank you for the opportunity. A deposit reserves your project start date; the remaining balance is due on completion.</textarea></div></section>
-        <section class="form-section"><div class="action-row"><button class="button primary" type="submit">Save quote</button><button class="button ghost" type="button" id="copyButton">Copy</button><button class="button ghost" type="button" id="printButton">Print / PDF</button></div></section>
+        <div class="builder-head">
+          <div><div class="eyebrow">Quote workspace</div><h1>Make the value obvious.</h1><p>Build a polished quote your client can say yes to.</p></div>
+          <select class="status-select" id="status" aria-label="Quote status"><option>Draft</option><option>Sent</option><option>Accepted</option></select>
+        </div>
+
+        <section class="form-section">
+          <div class="section-title"><div><h2>Your brand</h2><span>Shown on every client quote</span></div><button class="text-button locked-control" type="button" id="brandPresetButton" data-entitlement="brandProfiles">Brand presets <span class="tier-tag">Studio</span></button></div>
+          <div class="field-grid three">
+            <div class="field"><label for="business">Business name</label><input id="business" value="Alex Morgan Studio"></div>
+            <div class="field"><label for="currency">Currency</label><select id="currency"><option>USD</option><option>EUR</option><option>GBP</option><option>AED</option><option>CAD</option><option>AUD</option></select></div>
+            <div class="field"><label for="number">Quote no.</label><input id="number" value="QC-1048"></div>
+            <div class="field full"><label for="email">Your email</label><input id="email" type="email" value="hello@alexmorgan.studio"></div>
+            <div class="field full gated-field" id="accentField"><label for="accentColor">Brand accent <span class="tier-tag">Solo</span></label><div class="color-control"><input id="accentColor" type="color" value="#174c36" aria-label="Brand accent color"><span id="accentValue">#174c36</span></div></div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <div class="section-title"><div><h2>Client &amp; project</h2><span>Lead with the outcome</span></div></div>
+          <div class="field-grid">
+            <div class="field"><label for="client">Client / company</label><input id="client" value="Northstar Studio"></div>
+            <div class="field"><label for="project">Project name</label><input id="project" value="Brand refresh"></div>
+            <div class="field full"><label for="scope">Project scope</label><textarea id="scope">A focused brand refresh designed to sharpen recognition, build trust and give the team a consistent visual system.</textarea></div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <div class="section-title"><div><h2>Services</h2><span>Itemize the value</span></div></div>
+          <div class="items" id="items"><div class="item-row item-head" aria-hidden="true"><span>Description</span><span>Qty</span><span>Rate</span><span>Amount</span><span></span></div></div>
+          <button class="add-item" id="addItem" type="button">+ Add another service</button>
+        </section>
+
+        <section class="form-section">
+          <div class="section-title"><div><h2>Terms</h2><span>Set clear expectations</span></div></div>
+          <div class="totals-fields">
+            <div class="field"><label for="discount">Discount %</label><input id="discount" type="number" min="0" max="100" value="0"></div>
+            <div class="field"><label for="tax">Tax %</label><input id="tax" type="number" min="0" max="100" step=".1" value="0"></div>
+            <div class="field"><label for="deposit">Deposit %</label><input id="deposit" type="number" min="0" max="100" value="50"></div>
+            <div class="field"><label for="validDays">Valid days</label><input id="validDays" type="number" min="1" max="365" value="14"></div>
+          </div>
+          <div class="field gated-field" id="paymentField"><label for="paymentLink">Payment link <span class="tier-tag">Solo</span></label><input id="paymentLink" type="url" placeholder="https://your-payment-link.example"></div>
+          <div class="field spaced"><label for="note">Client note</label><textarea id="note">Thank you for the opportunity. A deposit reserves your project start date; the remaining balance is due on completion.</textarea></div>
+        </section>
+
+        <section class="form-section action-section">
+          <div class="action-row"><button class="button primary" type="submit" id="saveButton">Save quote</button><button class="button ghost" type="button" id="copyButton">Copy</button><button class="button ghost" type="button" id="printButton">Print / PDF</button></div>
+          <p class="save-help" id="saveHelp">Saved locally until you sign in.</p>
+        </section>
       </form>
-      <aside class="preview-wrap" aria-label="Live quote preview"><div class="preview-toolbar"><strong>Client preview</strong><span>Updates as you type</span></div><article class="document"><div class="doc-accent"></div><div class="doc-inner">
-        <header class="doc-header"><div class="doc-brand"><div class="doc-logo" id="outLogo">A</div><div><strong id="outBusiness"></strong><small id="outEmail"></small></div></div><div class="doc-meta"><strong>PROJECT QUOTE</strong><span id="outNumber"></span><br><span id="outDate"></span></div></header>
-        <section class="doc-title"><div class="eyebrow">Prepared proposal</div><h2 id="outProject"></h2><div class="prepared">Prepared for <strong id="outClient"></strong></div></section><p class="scope" id="outScope"></p>
-        <table class="doc-table"><thead><tr><th>Service</th><th>Qty</th><th>Rate</th><th>Amount</th></tr></thead><tbody id="outItems"></tbody></table>
-        <div class="summary"><div class="summary-line"><span>Subtotal</span><strong id="outSubtotal"></strong></div><div class="summary-line" id="discountLine"><span id="discountLabel">Discount</span><strong id="outDiscount"></strong></div><div class="summary-line" id="taxLine"><span id="taxLabel">Tax</span><strong id="outTax"></strong></div><div class="summary-line total"><span>Total</span><strong id="outTotal"></strong></div></div>
-        <div class="deposit-card"><div><small><span id="outDepositPercent">50%</span> deposit to begin</small><strong id="outDeposit"></strong></div><a class="pay-link" id="outPayment" href="#" target="_blank" rel="noopener" hidden>Pay deposit →</a></div><footer class="doc-footer"><p id="outNote"></p><p><strong>Valid for <span id="outValidDays">14</span> days</strong><br><span id="outStatus">Draft</span></p></footer>
-      </div></article></aside>
+
+      <aside class="preview-wrap" aria-label="Live quote preview">
+        <div class="preview-toolbar"><strong>Client preview</strong><span>Updates as you type</span></div>
+        <article class="document" id="quoteDocument">
+          <div class="doc-accent"></div>
+          <div class="doc-inner">
+            <header class="doc-header"><div class="doc-brand"><div class="doc-logo" id="outLogo">A</div><div><strong id="outBusiness"></strong><small id="outEmail"></small></div></div><div class="doc-meta"><strong>PROJECT QUOTE</strong><span id="outNumber"></span><br><span id="outDate"></span></div></header>
+            <section class="doc-title"><div class="eyebrow">Prepared proposal</div><h2 id="outProject"></h2><div class="prepared">Prepared for <strong id="outClient"></strong></div></section>
+            <p class="scope" id="outScope"></p>
+            <table class="doc-table"><thead><tr><th>Service</th><th>Qty</th><th>Rate</th><th>Amount</th></tr></thead><tbody id="outItems"></tbody></table>
+            <div class="summary"><div class="summary-line"><span>Subtotal</span><strong id="outSubtotal"></strong></div><div class="summary-line" id="discountLine"><span id="discountLabel">Discount</span><strong id="outDiscount"></strong></div><div class="summary-line" id="taxLine"><span id="taxLabel">Tax</span><strong id="outTax"></strong></div><div class="summary-line total"><span>Total</span><strong id="outTotal"></strong></div></div>
+            <div class="deposit-card"><div><small><span id="outDepositPercent">50%</span> deposit to begin</small><strong id="outDeposit"></strong></div><a class="pay-link" id="outPayment" href="#" target="_blank" rel="noopener" hidden>Pay deposit →</a></div>
+            <footer class="doc-footer"><p id="outNote"></p><p><strong>Valid for <span id="outValidDays">14</span> days</strong><br><span id="outStatus">Draft</span></p></footer>
+            <div class="powered-by" id="poweredBy">Made with <strong>QuoteCraft</strong></div>
+          </div>
+        </article>
+      </aside>
     </section>
   </main>
-  <aside class="saved-drawer" id="savedDrawer" aria-hidden="true"><div class="drawer-backdrop" data-close-drawer></div><section class="drawer" aria-label="Saved quotes"><div class="drawer-head"><div><div class="eyebrow">Your workspace</div><h2>Saved quotes</h2></div><button class="button icon ghost" type="button" data-close-drawer aria-label="Close saved quotes">✕</button></div><div class="saved-list" id="savedList"></div></section></aside>
+
+  <aside class="saved-drawer" id="savedDrawer" aria-hidden="true">
+    <div class="drawer-backdrop" data-close-drawer></div>
+    <section class="drawer" aria-label="Saved quotes">
+      <div class="drawer-head"><div><div class="eyebrow">Your workspace</div><h2>Saved quotes</h2><p id="storageLabel">On this device</p></div><button class="button icon ghost" type="button" data-close-drawer aria-label="Close saved quotes">✕</button></div>
+      <div class="quote-limit" id="quoteLimit"></div>
+      <div class="saved-list" id="savedList"></div>
+    </section>
+  </aside>
+
+  <section class="modal-shell" id="pricingModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="pricingTitle">
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="modal pricing-dialog">
+      <button class="modal-close" type="button" data-close-modal aria-label="Close pricing">✕</button>
+      <div class="modal-intro"><div class="eyebrow">Simple pricing</div><h2 id="pricingTitle">Pay when QuoteCraft earns its place.</h2><p>Start free. Upgrade when cloud capacity, polished branding, or multiple brands save more than the subscription costs.</p></div>
+      <div class="billing-toggle" role="group" aria-label="Billing interval"><button class="active" type="button" data-billing="monthly">Monthly</button><button type="button" data-billing="annual">Yearly <span>2 months free</span></button></div>
+      <div class="pricing-grid">
+        <article class="price-card"><div class="price-kicker">Free</div><h3>Starter</h3><div class="price"><strong>$0</strong><span>forever</span></div><p>Test your quoting workflow without a card.</p><ul><li>3 cloud-saved quotes</li><li>Live quote preview</li><li>PDF, print, and copy</li><li>QuoteCraft signature</li></ul><button class="button ghost full" type="button" data-choose-plan="free">Start free</button></article>
+        <article class="price-card featured"><div class="popular">Most popular</div><div class="price-kicker">Solo</div><h3>Close with confidence</h3><div class="price"><strong data-monthly="$9" data-annual="$90">$9</strong><span data-monthly="/ month" data-annual="/ year">/ month</span></div><p>For freelancers sending quotes every week.</p><ul><li>Unlimited cloud quotes</li><li>Custom brand accent</li><li>Payment-link button</li><li>Remove QuoteCraft signature</li></ul><div class="switch-reason">Why switch: one won quote can cover a full year.</div><button class="button primary full" type="button" data-choose-plan="solo">Choose Solo</button></article>
+        <article class="price-card"><div class="price-kicker">Studio</div><h3>Run every brand neatly</h3><div class="price"><strong data-monthly="$19" data-annual="$190">$19</strong><span data-monthly="/ month" data-annual="/ year">/ month</span></div><p>For operators managing several businesses or identities.</p><ul><li>Everything in Solo</li><li>5 reusable brand profiles</li><li>Unlimited cloud quotes</li><li>Priority email support</li></ul><div class="switch-reason">Why switch: reuse each brand in seconds, without costly mistakes.</div><button class="button dark full" type="button" data-choose-plan="studio">Choose Studio</button></article>
+      </div>
+      <p class="pricing-footnote">Paid access is granted only after a verified payment webhook. Prices exclude any tax Paddle must collect for the buyer's location.</p>
+    </div>
+  </section>
+
+  <section class="modal-shell" id="authModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="modal auth-dialog">
+      <button class="modal-close" type="button" data-close-modal aria-label="Close sign in">✕</button>
+      <div class="eyebrow">Your QuoteCraft account</div><h2 id="authTitle">Keep every quote close.</h2><p>Sign in to sync quotes across devices. New here? The same form creates your free account.</p>
+      <form id="authForm"><label for="authEmail">Email</label><input id="authEmail" type="email" autocomplete="email" required placeholder="you@business.com"><label for="authPassword">Password</label><input id="authPassword" type="password" autocomplete="current-password" minlength="8" required placeholder="At least 8 characters"><div class="auth-actions"><button class="button primary full" type="submit">Sign in</button><button class="button ghost full" type="button" id="signUpButton">Create free account</button></div></form>
+      <p class="auth-status" id="authStatus" role="status"></p>
+    </div>
+  </section>
+
+  <section class="modal-shell" id="accountModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="accountTitle">
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="modal account-dialog">
+      <button class="modal-close" type="button" data-close-modal aria-label="Close account">✕</button>
+      <div class="eyebrow">Account</div><h2 id="accountTitle">Your workspace</h2>
+      <div id="signedOutAccount"><p>Sign in to sync quotes and manage your plan.</p><button class="button primary full" type="button" data-open-auth>Sign in or create account</button></div>
+      <div id="signedInAccount" hidden><div class="account-row"><span>Email</span><strong id="accountEmail"></strong></div><div class="account-row"><span>Plan</span><strong id="accountPlan">Free</strong></div><div class="account-row"><span>Cloud storage</span><strong id="accountUsage">0 of 3 quotes</strong></div><button class="button primary full" type="button" data-open-pricing>Compare plans</button><button class="button ghost full" type="button" id="signOutButton">Sign out</button></div>
+    </div>
+  </section>
+
+  <section class="modal-shell" id="brandModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="brandTitle">
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="modal brand-dialog">
+      <button class="modal-close" type="button" data-close-modal aria-label="Close brand profiles">✕</button>
+      <div class="eyebrow">Studio feature</div><h2 id="brandTitle">Reusable brand profiles</h2><p>Save up to five identities and apply the right business details and accent in one click.</p>
+      <div class="saved-list" id="brandList"></div>
+      <button class="button primary full" id="saveBrandButton" type="button">Save current brand</button>
+    </div>
+  </section>
+
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script>
-    (function(){
-      'use strict';
-      var byId=function(id){return document.getElementById(id)};
-      var fields=['business','currency','number','email','client','project','scope','discount','tax','deposit','validDays','paymentLink','note','status'];
-      var state={items:[],currentId:null};
-      function makeId(){return globalThis.crypto&&crypto.randomUUID?crypto.randomUUID():'id-'+Date.now()+'-'+Math.random().toString(16).slice(2)}
-      var starter=[{id:makeId(),name:'Visual direction & moodboard',qty:1,rate:650},{id:makeId(),name:'Logo refinement',qty:1,rate:1150},{id:makeId(),name:'Brand guidelines & asset handoff',qty:1,rate:600}];
-      function safeNumber(value,min,max){var n=Number(value);min=min===undefined?0:min;max=max===undefined?Infinity:max;return Math.min(max,Math.max(min,Number.isFinite(n)?n:0))}
-      function money(value){var amount=Number(value||0);var currency=byId('currency').value||'USD';var decimals=Number.isInteger(amount)?0:2;try{return new Intl.NumberFormat('en',{style:'currency',currency:currency,minimumFractionDigits:decimals,maximumFractionDigits:2}).format(amount)}catch(error){return currency+' '+amount.toFixed(decimals)}}
-      function escapeHtml(value){return String(value==null?'':value).replace(/[&<>'"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]})}
-      function renderItems(){byId('items').querySelectorAll('.service-row').forEach(function(row){row.remove()});state.items.forEach(function(item){var row=document.createElement('div');row.className='item-row service-row';row.dataset.id=item.id;row.innerHTML='<input class="item-name" aria-label="Service description" value="'+escapeHtml(item.name)+'" placeholder="Service description"><input class="item-qty" aria-label="Quantity" type="number" min="0" step="1" value="'+item.qty+'"><input class="item-rate" aria-label="Rate" type="number" min="0" step=".01" value="'+item.rate+'"><span class="item-total">'+money(item.qty*item.rate)+'</span><button class="button icon danger remove-item" type="button" aria-label="Remove service">×</button>';byId('items').appendChild(row)})}
-      function syncItems(){state.items=Array.from(document.querySelectorAll('.service-row')).map(function(row){return{id:row.dataset.id,name:row.querySelector('.item-name').value,qty:safeNumber(row.querySelector('.item-qty').value),rate:safeNumber(row.querySelector('.item-rate').value)}})}
-      function totals(){var subtotal=state.items.reduce(function(sum,item){return sum+item.qty*item.rate},0);var discountRate=safeNumber(byId('discount').value,0,100);var taxRate=safeNumber(byId('tax').value,0,100);var discount=subtotal*discountRate/100;var tax=(subtotal-discount)*taxRate/100;var total=subtotal-discount+tax;var depositRate=safeNumber(byId('deposit').value,0,100);return{subtotal:subtotal,discountRate:discountRate,discount:discount,taxRate:taxRate,tax:tax,total:total,depositRate:depositRate,deposit:total*depositRate/100}}
-      function update(){
-        syncItems();var business=byId('business').value.trim()||'Your business';byId('outLogo').textContent=business.charAt(0).toUpperCase();byId('outBusiness').textContent=business;byId('outEmail').textContent=byId('email').value.trim()||'your@email.com';byId('outNumber').textContent=byId('number').value.trim()||'—';byId('outDate').textContent=new Intl.DateTimeFormat('en',{day:'numeric',month:'short',year:'numeric'}).format(new Date());byId('outProject').textContent=byId('project').value.trim()||'Untitled project';byId('outClient').textContent=byId('client').value.trim()||'Your client';byId('outScope').textContent=byId('scope').value.trim()||'Project scope to be confirmed.';byId('outNote').textContent=byId('note').value.trim();byId('outValidDays').textContent=Math.max(1,Number(byId('validDays').value)||14);byId('outStatus').textContent=byId('status').value;
-        byId('outItems').innerHTML=state.items.length?state.items.map(function(item){return '<tr><td>'+escapeHtml(item.name||'Service')+'</td><td>'+item.qty+'</td><td>'+money(item.rate)+'</td><td>'+money(item.qty*item.rate)+'</td></tr>'}).join(''):'<tr><td>No services added</td><td>—</td><td>—</td><td>—</td></tr>';
-        var sum=totals();byId('outSubtotal').textContent=money(sum.subtotal);byId('discountLabel').textContent='Discount ('+sum.discountRate+'%)';byId('outDiscount').textContent='−'+money(sum.discount);byId('discountLine').hidden=sum.discountRate===0;byId('taxLabel').textContent='Tax ('+sum.taxRate+'%)';byId('outTax').textContent=money(sum.tax);byId('taxLine').hidden=sum.taxRate===0;byId('outTotal').textContent=money(sum.total);byId('outDepositPercent').textContent=sum.depositRate+'%';byId('outDeposit').textContent=money(sum.deposit);var link=byId('paymentLink').value.trim();var valid=/^https?:\/\//i.test(link);byId('outPayment').hidden=!valid;byId('outPayment').href=valid?link:'#';document.querySelectorAll('.item-total').forEach(function(el,i){if(state.items[i])el.textContent=money(state.items[i].qty*state.items[i].rate)})
-      }
-      function serialize(){syncItems();var data={};fields.forEach(function(id){data[id]=byId(id).value});data.id=state.currentId||makeId();data.items=state.items;data.updatedAt=new Date().toISOString();data.total=totals().total;return data}
-      function getSaved(){try{return JSON.parse(localStorage.getItem('quotecraft-quotes')||'[]')}catch(error){return[]}}
-      function setSaved(quotes){localStorage.setItem('quotecraft-quotes',JSON.stringify(quotes));renderSaved()}
-      function saveQuote(event){if(event)event.preventDefault();var quote=serialize();state.currentId=quote.id;var saved=getSaved();var index=saved.findIndex(function(item){return item.id===quote.id});if(index>=0)saved[index]=quote;else saved.unshift(quote);setSaved(saved);showToast(index>=0?'Quote updated':'Quote saved to this device')}
-      function loadQuote(id){var quote=getSaved().find(function(item){return item.id===id});if(!quote)return;fields.forEach(function(field){if(quote[field]!==undefined)byId(field).value=quote[field]});state.items=Array.isArray(quote.items)?quote.items:[];state.currentId=quote.id;renderItems();update();closeDrawer();showToast('Saved quote loaded');window.scrollTo({top:0,behavior:'smooth'})}
-      function deleteQuote(id){setSaved(getSaved().filter(function(item){return item.id!==id}));if(state.currentId===id)state.currentId=null;showToast('Saved quote removed')}
-      function savedMoney(value,currency){try{return new Intl.NumberFormat('en',{style:'currency',currency:currency||'USD',maximumFractionDigits:2}).format(value||0)}catch(error){return (currency||'USD')+' '+Number(value||0).toFixed(2)}}
-      function renderSaved(){var saved=getSaved();byId('savedCount').textContent=saved.length;if(!saved.length){byId('savedList').innerHTML='<div class="saved-empty"><strong>No saved quotes yet</strong><br><span>Save this quote and it will appear here.</span></div>';return}byId('savedList').innerHTML=saved.map(function(q){return '<article class="saved-card"><div class="saved-top"><div><h3>'+escapeHtml(q.project||'Untitled project')+'</h3><p>'+escapeHtml(q.client||'No client')+' · '+escapeHtml(q.number||'No number')+'</p></div><div class="saved-amount">'+savedMoney(q.total,q.currency)+'</div></div><p style="margin-top:7px">Updated '+new Intl.DateTimeFormat('en',{month:'short',day:'numeric',year:'numeric'}).format(new Date(q.updatedAt))+'</p><div class="saved-actions"><button class="button small primary load-quote" data-id="'+q.id+'" type="button">Open</button><button class="button small ghost delete-quote danger" data-id="'+q.id+'" type="button">Delete</button></div></article>'}).join('')}
-      function quoteText(){var sum=totals();var lines=state.items.map(function(item){return '• '+(item.name||'Service')+' — '+item.qty+' × '+money(item.rate)+' = '+money(item.qty*item.rate)}).join('\n');var payment=/^https?:\/\//i.test(byId('paymentLink').value.trim())?'\nPay deposit: '+byId('paymentLink').value.trim():'';return ['PROJECT QUOTE '+byId('number').value.trim(),byId('project').value.trim()||'Untitled project','Prepared for '+(byId('client').value.trim()||'Your client'),' ',byId('scope').value.trim(),' ',lines,' ','Total: '+money(sum.total),sum.depositRate+'% deposit to begin: '+money(sum.deposit),'Valid for '+(byId('validDays').value||14)+' days.'+payment,' ',byId('note').value.trim(),' ',byId('business').value.trim()+' · '+byId('email').value.trim()].join('\n')}
-      function copyQuote(){update();var text=quoteText();if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(function(){showToast('Quote copied — ready to send')}).catch(function(){fallbackCopy(text)})}else fallbackCopy(text)}
-      function fallbackCopy(text){var area=document.createElement('textarea');area.value=text;document.body.appendChild(area);area.select();document.execCommand('copy');area.remove();showToast('Quote copied — ready to send')}
-      function newQuote(){state.currentId=null;byId('number').value='QC-'+String(Math.floor(1000+Math.random()*9000));byId('client').value='';byId('project').value='';byId('scope').value='';byId('paymentLink').value='';byId('status').value='Draft';state.items=[{id:makeId(),name:'',qty:1,rate:0}];renderItems();update();showToast('Fresh quote ready')}
-      function openDrawer(){byId('savedDrawer').classList.add('open');byId('savedDrawer').setAttribute('aria-hidden','false')}function closeDrawer(){byId('savedDrawer').classList.remove('open');byId('savedDrawer').setAttribute('aria-hidden','true')}var toastTimer;function showToast(message){clearTimeout(toastTimer);byId('toast').textContent=message;byId('toast').classList.add('show');toastTimer=setTimeout(function(){byId('toast').classList.remove('show')},2600)}
-      byId('quoteForm').addEventListener('input',update);byId('quoteForm').addEventListener('change',update);byId('quoteForm').addEventListener('submit',saveQuote);byId('addItem').addEventListener('click',function(){syncItems();state.items.push({id:makeId(),name:'',qty:1,rate:0});renderItems();update();var input=document.querySelector('.service-row:last-child .item-name');if(input)input.focus()});byId('items').addEventListener('click',function(event){var button=event.target.closest('.remove-item');if(!button)return;if(state.items.length===1){showToast('Keep at least one service');return}syncItems();var id=button.closest('.service-row').dataset.id;state.items=state.items.filter(function(item){return item.id!==id});renderItems();update()});byId('copyButton').addEventListener('click',copyQuote);byId('printButton').addEventListener('click',function(){window.print()});byId('savedButton').addEventListener('click',openDrawer);byId('newButton').addEventListener('click',newQuote);document.querySelectorAll('[data-close-drawer]').forEach(function(item){item.addEventListener('click',closeDrawer)});byId('savedList').addEventListener('click',function(event){var load=event.target.closest('.load-quote');var remove=event.target.closest('.delete-quote');if(load)loadQuote(load.dataset.id);if(remove)deleteQuote(remove.dataset.id)});document.addEventListener('keydown',function(event){if(event.key==='Escape')closeDrawer()});
-      state.items=starter;renderItems();renderSaved();update();
-    })();
-  </script>
 </body>
 </html>
-
