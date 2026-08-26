@@ -2,4 +2,6 @@
 work/
 outputs/
 *.log
-
+.env
+.env.*
+!.env.example
