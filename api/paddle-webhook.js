@@ -26,6 +26,14 @@ export function planFromPriceId(priceId){
   return map[priceId]||'free';
 }
 
+export function planForSubscriptionEvent(eventType,status,priceId){
+  var handledEvents=['subscription.created','subscription.activated','subscription.trialing','subscription.updated','subscription.past_due','subscription.resumed','subscription.canceled','subscription.paused'];
+  if(!handledEvents.includes(eventType))return null;
+  var plan=planFromPriceId(priceId);var activeStatuses=['active','trialing'];
+  if(eventType==='subscription.canceled'||eventType==='subscription.paused'||!activeStatuses.includes(status))return 'free';
+  return plan;
+}
+
 function extractPriceId(data){
   var items=data&&data.items;if(Array.isArray(items)&&items[0])return items[0].price&&items[0].price.id?items[0].price.id:(items[0].price_id||'');
   return '';
@@ -44,11 +52,9 @@ export default async function handler(request,response){
     var rawBody=await readRawBody(request);var signature=request.headers['paddle-signature'];var secret=process.env.PADDLE_WEBHOOK_SECRET;
     if(!verifyPaddleSignature(rawBody,signature,secret))return response.status(401).json({error:'Invalid webhook signature'});
     var event=JSON.parse(rawBody);var data=event.data||{};var custom=data.custom_data||{};var userId=custom.supabase_user_id;
-    var handledEvents=['subscription.created','subscription.activated','subscription.updated','subscription.resumed','subscription.canceled','subscription.paused'];
-    if(!handledEvents.includes(event.event_type))return response.status(200).json({received:true,ignored:'Event does not change entitlements'});
+    var eventType=event.event_type||'';var status=data.status||'';var plan=planForSubscriptionEvent(eventType,status,extractPriceId(data));
+    if(plan===null)return response.status(200).json({received:true,ignored:'Event does not change entitlements'});
     if(!userId)return response.status(200).json({received:true,ignored:'No QuoteCraft user ID'});
-    var activeStatuses=['active','trialing'];var eventType=event.event_type||'';var status=data.status||'';var plan=planFromPriceId(extractPriceId(data));
-    if(eventType==='subscription.canceled'||eventType==='subscription.paused'||eventType==='subscription.expired'||!activeStatuses.includes(status))plan='free';
     var patch={plan:plan,subscription_status:status||eventType,paddle_customer_id:data.customer_id||null,paddle_subscription_id:data.id&&String(data.id).startsWith('sub_')?data.id:null,subscription_ends_at:data.current_billing_period&&data.current_billing_period.ends_at?data.current_billing_period.ends_at:null,updated_at:new Date().toISOString()};
     await updateProfile(userId,patch);
     return response.status(200).json({received:true});
