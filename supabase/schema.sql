@@ -40,10 +40,15 @@ create table if not exists public.brand_profiles (
 
 create index if not exists brand_profiles_user_idx on public.brand_profiles(user_id,created_at);
 
-create or replace function public.handle_new_quotecraft_user()
+create schema if not exists quotecraft_private;
+
+revoke all on schema quotecraft_private from public, anon, authenticated, service_role;
+grant usage on schema quotecraft_private to authenticated;
+
+create or replace function quotecraft_private.handle_new_quotecraft_user()
 returns trigger
 language plpgsql
-security definer set search_path=public
+security definer set search_path=''
 as $$
 begin
   insert into public.profiles(id,email) values(new.id,new.email)
@@ -55,13 +60,13 @@ $$;
 drop trigger if exists on_auth_user_created_quotecraft on auth.users;
 create trigger on_auth_user_created_quotecraft
 after insert or update of email on auth.users
-for each row execute procedure public.handle_new_quotecraft_user();
+for each row execute procedure quotecraft_private.handle_new_quotecraft_user();
 
-create or replace function public.current_quotecraft_plan(requested_user uuid)
+create or replace function quotecraft_private.current_quotecraft_plan(requested_user uuid)
 returns text
 language sql
 stable
-security definer set search_path=public
+security definer set search_path=''
 as $$
   select case
     when p.plan in ('solo','studio') and p.subscription_status in ('active','trialing') then p.plan
@@ -71,60 +76,67 @@ as $$
   where p.id=requested_user and requested_user=auth.uid();
 $$;
 
-create or replace function public.can_create_quotecraft_quote(requested_user uuid)
+create or replace function quotecraft_private.can_create_quotecraft_quote(requested_user uuid)
 returns boolean
 language sql
 stable
-security definer set search_path=public
+security definer set search_path=''
 as $$
   select requested_user=auth.uid() and case
-    when coalesce(public.current_quotecraft_plan(requested_user),'free')<>'free' then true
+    when coalesce(quotecraft_private.current_quotecraft_plan(requested_user),'free')<>'free' then true
     else (select count(*) from public.quotes q where q.user_id=requested_user)<3
   end;
 $$;
 
-create or replace function public.can_create_quotecraft_brand(requested_user uuid)
+create or replace function quotecraft_private.can_create_quotecraft_brand(requested_user uuid)
 returns boolean
 language sql
 stable
-security definer set search_path=public
+security definer set search_path=''
 as $$
   select requested_user=auth.uid()
-    and coalesce(public.current_quotecraft_plan(requested_user),'free')='studio'
+    and coalesce(quotecraft_private.current_quotecraft_plan(requested_user),'free')='studio'
     and (select count(*) from public.brand_profiles b where b.user_id=requested_user)<5;
 $$;
 
-revoke all on function public.current_quotecraft_plan(uuid) from public;
-revoke all on function public.can_create_quotecraft_quote(uuid) from public;
-revoke all on function public.can_create_quotecraft_brand(uuid) from public;
-grant execute on function public.current_quotecraft_plan(uuid) to authenticated;
-grant execute on function public.can_create_quotecraft_quote(uuid) to authenticated;
-grant execute on function public.can_create_quotecraft_brand(uuid) to authenticated;
+revoke all on function quotecraft_private.handle_new_quotecraft_user() from public, anon, authenticated, service_role;
+revoke all on function quotecraft_private.current_quotecraft_plan(uuid) from public, anon, authenticated, service_role;
+revoke all on function quotecraft_private.can_create_quotecraft_quote(uuid) from public, anon, authenticated, service_role;
+revoke all on function quotecraft_private.can_create_quotecraft_brand(uuid) from public, anon, authenticated, service_role;
+grant execute on function quotecraft_private.current_quotecraft_plan(uuid) to authenticated;
+grant execute on function quotecraft_private.can_create_quotecraft_quote(uuid) to authenticated;
+grant execute on function quotecraft_private.can_create_quotecraft_brand(uuid) to authenticated;
 
 alter table public.profiles enable row level security;
 alter table public.quotes enable row level security;
 alter table public.brand_profiles enable row level security;
 
 drop policy if exists "profiles_select_own" on public.profiles;
-create policy "profiles_select_own" on public.profiles for select to authenticated using (auth.uid()=id);
+create policy "profiles_select_own" on public.profiles for select to authenticated using ((select auth.uid())=id);
 
 drop policy if exists "quotes_select_own" on public.quotes;
-create policy "quotes_select_own" on public.quotes for select to authenticated using (auth.uid()=user_id);
+create policy "quotes_select_own" on public.quotes for select to authenticated using ((select auth.uid())=user_id);
 drop policy if exists "quotes_insert_own_with_plan_limit" on public.quotes;
-create policy "quotes_insert_own_with_plan_limit" on public.quotes for insert to authenticated with check (auth.uid()=user_id and public.can_create_quotecraft_quote(auth.uid()));
+create policy "quotes_insert_own_with_plan_limit" on public.quotes for insert to authenticated with check ((select auth.uid())=user_id and (select quotecraft_private.can_create_quotecraft_quote((select auth.uid()))));
 drop policy if exists "quotes_update_own" on public.quotes;
-create policy "quotes_update_own" on public.quotes for update to authenticated using (auth.uid()=user_id) with check (auth.uid()=user_id);
+create policy "quotes_update_own" on public.quotes for update to authenticated using ((select auth.uid())=user_id) with check ((select auth.uid())=user_id);
 drop policy if exists "quotes_delete_own" on public.quotes;
-create policy "quotes_delete_own" on public.quotes for delete to authenticated using (auth.uid()=user_id);
+create policy "quotes_delete_own" on public.quotes for delete to authenticated using ((select auth.uid())=user_id);
 
 drop policy if exists "brands_select_studio_own" on public.brand_profiles;
-create policy "brands_select_studio_own" on public.brand_profiles for select to authenticated using (auth.uid()=user_id and public.current_quotecraft_plan(auth.uid())='studio');
+create policy "brands_select_studio_own" on public.brand_profiles for select to authenticated using ((select auth.uid())=user_id and (select quotecraft_private.current_quotecraft_plan((select auth.uid())))='studio');
 drop policy if exists "brands_insert_studio_own" on public.brand_profiles;
-create policy "brands_insert_studio_own" on public.brand_profiles for insert to authenticated with check (auth.uid()=user_id and public.can_create_quotecraft_brand(auth.uid()));
+create policy "brands_insert_studio_own" on public.brand_profiles for insert to authenticated with check ((select auth.uid())=user_id and (select quotecraft_private.can_create_quotecraft_brand((select auth.uid()))));
 drop policy if exists "brands_update_studio_own" on public.brand_profiles;
-create policy "brands_update_studio_own" on public.brand_profiles for update to authenticated using (auth.uid()=user_id and public.current_quotecraft_plan(auth.uid())='studio') with check (auth.uid()=user_id);
+create policy "brands_update_studio_own" on public.brand_profiles for update to authenticated using ((select auth.uid())=user_id and (select quotecraft_private.current_quotecraft_plan((select auth.uid())))='studio') with check ((select auth.uid())=user_id);
 drop policy if exists "brands_delete_studio_own" on public.brand_profiles;
-create policy "brands_delete_studio_own" on public.brand_profiles for delete to authenticated using (auth.uid()=user_id and public.current_quotecraft_plan(auth.uid())='studio');
+create policy "brands_delete_studio_own" on public.brand_profiles for delete to authenticated using ((select auth.uid())=user_id and (select quotecraft_private.current_quotecraft_plan((select auth.uid())))='studio');
+
+-- Remove the earlier public helper functions after all policies and triggers use the private schema.
+drop function if exists public.handle_new_quotecraft_user();
+drop function if exists public.current_quotecraft_plan(uuid);
+drop function if exists public.can_create_quotecraft_quote(uuid);
+drop function if exists public.can_create_quotecraft_brand(uuid);
 
 revoke all on table public.profiles from anon,authenticated;
 grant select on table public.profiles to authenticated;
