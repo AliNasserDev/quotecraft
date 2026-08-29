@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">QuoteCraft</string>
+    <string name="title_activity_main">QuoteCraft</string>
+    <string name="package_name">com.alinasserdev.quotecraft</string>
+    <string name="custom_url_scheme">com.alinasserdev.quotecraft</string>
+</resources>

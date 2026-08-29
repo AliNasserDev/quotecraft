@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
   <script src="https://cdn.paddle.com/paddle/v2/paddle.js" defer></script>
-  <script src="app.js" defer></script>
+  <script type="module" src="/app.js"></script>
 </head>
 <body>
   <main class="app">
@@ -145,7 +145,7 @@
       <button class="modal-close" type="button" data-close-modal aria-label="Close account">✕</button>
       <div class="eyebrow">Account</div><h2 id="accountTitle">Your workspace</h2>
       <div id="signedOutAccount"><p>Sign in to sync quotes and manage your plan.</p><button class="button primary full" type="button" data-open-auth>Sign in or create account</button></div>
-      <div id="signedInAccount" hidden><div class="account-row"><span>Email</span><strong id="accountEmail"></strong></div><div class="account-row"><span>Plan</span><strong id="accountPlan">Free</strong></div><div class="account-row"><span>Cloud storage</span><strong id="accountUsage">0 of 3 quotes</strong></div><button class="button primary full" type="button" data-open-pricing>Compare plans</button><button class="button ghost full" type="button" id="signOutButton">Sign out</button></div>
+      <div id="signedInAccount" hidden><div class="account-row"><span>Email</span><strong id="accountEmail"></strong></div><div class="account-row"><span>Plan</span><strong id="accountPlan">Free</strong></div><div class="account-row"><span>RevenueCat</span><strong id="revenueCatStatus">Not connected</strong></div><div class="account-row"><span>Cloud storage</span><strong id="accountUsage">0 of 3 quotes</strong></div><button class="button primary full" type="button" data-open-pricing>Compare plans</button><button class="button ghost full" type="button" id="restorePurchasesButton">Restore purchases</button><button class="button ghost full" type="button" id="signOutButton">Sign out</button></div>
     </div>
   </section>
 

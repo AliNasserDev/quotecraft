@@ -1,14 +1,18 @@
+import {Capacitor} from '@capacitor/core';
+
 (function(){
   'use strict';
 
   var byId=function(id){return document.getElementById(id)};
+  var NativePurchases=null,WebPurchases=null,ErrorCode=null,LogLevel=null;
   var fields=['business','currency','number','email','client','project','scope','discount','tax','deposit','validDays','paymentLink','note','status','accentColor'];
   var plans={
     free:{name:'Free',maxCloudQuotes:3,customColor:false,paymentLinks:false,removeBranding:false,brandProfiles:0},
     solo:{name:'Solo',maxCloudQuotes:Infinity,customColor:true,paymentLinks:true,removeBranding:true,brandProfiles:0},
     studio:{name:'Studio',maxCloudQuotes:Infinity,customColor:true,paymentLinks:true,removeBranding:true,brandProfiles:5}
   };
-  var state={items:[],currentId:null,user:null,profile:null,plan:'free',cloudQuotes:[],brands:[],client:null,config:null,paddleReady:false,billing:'monthly'};
+  var state={items:[],currentId:null,user:null,profile:null,profilePlan:'free',plan:'free',cloudQuotes:[],brands:[],client:null,config:null,paddleReady:false,billing:'monthly',revenueCat:null,revenueCatReady:false,revenueCatMode:'off',revenueCatUserId:null,revenueCatPlan:'free',revenueCatOfferings:null,revenueCatCustomerInfo:null};
+  var nativePlatform=Capacitor.isNativePlatform();
   var starter=[
     {id:makeId(),name:'Visual direction & moodboard',qty:1,rate:650},
     {id:makeId(),name:'Logo refinement',qty:1,rate:1150},
@@ -20,6 +24,9 @@
   function safeNumber(value,min,max){var n=Number(value);min=min===undefined?0:min;max=max===undefined?Infinity:max;return Math.min(max,Math.max(min,Number.isFinite(n)?n:0))}
   function escapeHtml(value){return String(value==null?'':value).replace(/[&<>'"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]})}
   function entitlement(){return plans[state.plan]||plans.free}
+  function planRank(plan){return{free:0,solo:1,studio:2}[plan]||0}
+  function planFromRevenueCat(customerInfo){var active=customerInfo&&customerInfo.entitlements&&customerInfo.entitlements.active?customerInfo.entitlements.active:{};var keys=Object.keys(active).map(function(key){return key.toLowerCase()});var studio=(state.config&&state.config.revenueCatEntitlements&&state.config.revenueCatEntitlements.studio||'quotecraft_studio').toLowerCase();var solo=(state.config&&state.config.revenueCatEntitlements&&state.config.revenueCatEntitlements.solo||'quotecraft_solo').toLowerCase();if(keys.includes(studio)||keys.includes('studio'))return'studio';if(keys.includes(solo)||keys.includes('solo'))return'solo';return'free'}
+  function reconcilePlan(){state.plan=planRank(state.revenueCatPlan)>planRank(state.profilePlan)?state.revenueCatPlan:state.profilePlan;renderAccount();applyEntitlements()}
   function money(value,currencyOverride){var amount=Number(value||0);var currency=currencyOverride||byId('currency').value||'USD';var decimals=Number.isInteger(amount)?0:2;try{return new Intl.NumberFormat('en',{style:'currency',currency:currency,minimumFractionDigits:decimals,maximumFractionDigits:2}).format(amount)}catch(error){return currency+' '+amount.toFixed(decimals)}}
 
   function renderItems(){
@@ -95,7 +102,7 @@
   function newQuote(){state.currentId=null;byId('number').value='QC-'+String(Math.floor(1000+Math.random()*9000));byId('client').value='';byId('project').value='';byId('scope').value='';byId('paymentLink').value='';byId('status').value='Draft';state.items=[{id:makeId(),name:'',qty:1,rate:0}];renderItems();update();showToast('Fresh quote ready')}
 
   async function loadCloudQuotes(){if(!state.client||!state.user)return;var result=await state.client.from('quotes').select('id,payload,total,currency,updated_at').order('updated_at',{ascending:false});if(result.error){showToast('Cloud library unavailable');return}state.cloudQuotes=(result.data||[]).map(function(row){return Object.assign({},row.payload,{id:row.id,total:row.total,currency:row.currency,updatedAt:row.updated_at})});renderSaved()}
-  async function loadProfile(){if(!state.client||!state.user)return;var result=await state.client.from('profiles').select('plan,subscription_status,paddle_customer_id').eq('id',state.user.id).single();state.profile=result.data||{plan:'free',subscription_status:'inactive'};var paidActive=['active','trialing'].includes(state.profile.subscription_status);state.plan=paidActive&&plans[state.profile.plan]?state.profile.plan:'free';renderAccount();applyEntitlements()}
+  async function loadProfile(){if(!state.client||!state.user)return;var result=await state.client.from('profiles').select('plan,subscription_status,paddle_customer_id').eq('id',state.user.id).single();state.profile=result.data||{plan:'free',subscription_status:'inactive'};var paidActive=['active','trialing'].includes(state.profile.subscription_status);state.profilePlan=paidActive&&plans[state.profile.plan]?state.profile.plan:'free';reconcilePlan()}
   async function loadBrands(){if(!state.client||!state.user||state.plan!=='studio')return;var result=await state.client.from('brand_profiles').select('*').order('created_at',{ascending:true});state.brands=result.data||[];renderBrands()}
 
   function applyEntitlements(){
@@ -110,11 +117,44 @@
   function renderAccount(){
     var signedIn=!!state.user;byId('signedOutAccount').hidden=signedIn;byId('signedInAccount').hidden=!signedIn;byId('launchNote').hidden=signedIn;
     byId('avatarInitial').textContent=signedIn?(state.user.email||'?').charAt(0).toUpperCase():'?';
-    if(signedIn)byId('accountEmail').textContent=state.user.email||'';
+    if(signedIn){byId('accountEmail').textContent=state.user.email||'';var platformConfigured=state.config&&(nativePlatform?state.config.revenueCatAndroidConfigured:state.config.revenueCatWebConfigured);var status=state.revenueCatReady?'Connected · '+(nativePlatform?'Android SDK':'Web SDK'):(state.revenueCatMode==='error'?'Connection failed':(platformConfigured?'Connecting…':'Setup pending'));byId('revenueCatStatus').textContent=status;byId('restorePurchasesButton').hidden=!nativePlatform}
+  }
+
+  function revenueCatPackages(){var current=state.revenueCatOfferings&&state.revenueCatOfferings.current;return current&&Array.isArray(current.availablePackages)?current.availablePackages:[]}
+  function revenueCatPackage(plan,interval){var wanted=plan+'_'+interval;var packages=revenueCatPackages();return packages.find(function(item){return String(item.identifier||'').toLowerCase()===wanted})||packages.find(function(item){var product=item.product||item.webBillingProduct||{};var productId=String(product.identifier||product.id||'').toLowerCase();return productId.includes(plan)&&productId.includes(interval==='annual'?'annual':'monthly')})||null}
+  async function refreshRevenueCat(customerInfo){
+    if(!state.revenueCatReady)return;
+    try{
+      if(!customerInfo){if(nativePlatform){customerInfo=(await NativePurchases.getCustomerInfo()).customerInfo}else customerInfo=await state.revenueCat.getCustomerInfo()}
+      state.revenueCatCustomerInfo=customerInfo;state.revenueCatPlan=planFromRevenueCat(customerInfo);
+      state.revenueCatOfferings=nativePlatform?await NativePurchases.getOfferings():await state.revenueCat.getOfferings();
+      reconcilePlan();
+    }catch(error){console.warn('RevenueCat refresh failed',error);renderAccount()}
+  }
+  async function configureRevenueCat(user){
+    var platformConfigured=state.config&&(nativePlatform?state.config.revenueCatAndroidConfigured:state.config.revenueCatWebConfigured);
+    if(!user||!platformConfigured){state.revenueCatReady=false;state.revenueCatMode='off';state.revenueCatPlan='free';renderAccount();return}
+    try{
+      if(nativePlatform){
+        var nativeModule=await import('@revenuecat/purchases-capacitor');NativePurchases=nativeModule.Purchases;
+        var nativeKey=state.config.revenueCatAndroidApiKey;if(!nativeKey)throw new Error('RevenueCat Android key is missing');
+        var configured=await NativePurchases.isConfigured();
+        if(!configured.isConfigured)await NativePurchases.configure({apiKey:nativeKey,appUserID:user.id});else if(state.revenueCatUserId!==user.id)await NativePurchases.logIn({appUserID:user.id});
+        state.revenueCatMode='native';
+      }else{
+        var webModule=await import('@revenuecat/purchases-js');WebPurchases=webModule.Purchases;ErrorCode=webModule.ErrorCode;LogLevel=webModule.LogLevel;
+        var webKey=state.config.revenueCatWebApiKey;if(!webKey)throw new Error('RevenueCat web key is missing');
+        WebPurchases.setLogLevel(location.hostname==='localhost'?LogLevel.Debug:LogLevel.Error);
+        if(!WebPurchases.isConfigured())state.revenueCat=WebPurchases.configure({apiKey:webKey,appUserId:user.id});else{state.revenueCat=WebPurchases.getSharedInstance();if(state.revenueCat.getAppUserId()!==user.id)await state.revenueCat.changeUser(user.id)}
+        state.revenueCatMode='web';
+      }
+      state.revenueCatUserId=user.id;state.revenueCatReady=true;await refreshRevenueCat();
+    }catch(error){state.revenueCatReady=false;state.revenueCatMode='error';console.warn('RevenueCat setup failed',error);renderAccount()}
   }
 
   async function configureServices(){
-    try{var response=await fetch('api/config',{cache:'no-store'});if(!response.ok)throw new Error('Configuration unavailable');state.config=await response.json()}catch(error){state.config={supabaseConfigured:false,paddleConfigured:false,prices:{}}}
+    var configUrl=nativePlatform?'https://quotecraft-rose.vercel.app/api/config':'/api/config';
+    try{var response=await fetch(configUrl,{cache:'no-store'});if(!response.ok)throw new Error('Configuration unavailable');state.config=await response.json()}catch(error){state.config={supabaseConfigured:false,paddleConfigured:false,revenueCatConfigured:false,prices:{}}}
     if(state.config.supabaseConfigured&&window.supabase){
       state.client=window.supabase.createClient(state.config.supabaseUrl,state.config.supabaseAnonKey);
       var sessionResult=await state.client.auth.getSession();await handleSession(sessionResult.data.session);
@@ -127,8 +167,8 @@
   }
 
   async function handleSession(session){
-    state.user=session&&session.user?session.user:null;state.cloudQuotes=[];state.profile=null;state.plan='free';renderAccount();
-    if(state.user){await Promise.all([loadProfile(),loadCloudQuotes()]);if(state.plan==='studio')await loadBrands()}else{applyEntitlements();renderSaved()}
+    state.user=session&&session.user?session.user:null;state.cloudQuotes=[];state.profile=null;state.profilePlan='free';state.revenueCatPlan='free';state.plan='free';renderAccount();
+    if(state.user){await Promise.all([loadProfile(),loadCloudQuotes(),configureRevenueCat(state.user)]);if(state.plan==='studio')await loadBrands()}else{state.revenueCatReady=false;applyEntitlements();renderSaved()}
   }
 
   async function signIn(event){
@@ -144,7 +184,7 @@
     if(result.error){byId('authStatus').textContent=result.error.message;return}byId('authStatus').textContent=result.data.session?'Account created — cloud sync is on.':'Check your email to confirm the account, then sign in.';if(result.data.session){closeModals();showToast('Free account created')}
   }
 
-  async function signOut(){if(state.client)await state.client.auth.signOut();closeModals();showToast('Signed out — local mode is active')}
+  async function signOut(){if(nativePlatform&&state.revenueCatReady){try{await NativePurchases.logOut()}catch(error){console.warn('RevenueCat logout failed',error)}}if(state.client)await state.client.auth.signOut();closeModals();showToast('Signed out — local mode is active')}
 
   function openModal(id){closeModals();var modal=byId(id);modal.classList.add('open');modal.setAttribute('aria-hidden','false');document.body.classList.add('modal-open')}
   function closeModals(){document.querySelectorAll('.modal-shell.open').forEach(function(modal){modal.classList.remove('open');modal.setAttribute('aria-hidden','true')});document.body.classList.remove('modal-open')}
@@ -155,13 +195,22 @@
   function closeDrawer(){byId('savedDrawer').classList.remove('open');byId('savedDrawer').setAttribute('aria-hidden','true')}
 
   function setBilling(interval){state.billing=interval;document.querySelectorAll('[data-billing]').forEach(function(button){button.classList.toggle('active',button.dataset.billing===interval)});document.querySelectorAll('[data-monthly][data-annual]').forEach(function(el){el.textContent=el.dataset[interval]})}
-  function choosePlan(plan){
+  async function choosePlan(plan){
     if(plan==='free'){if(!state.user){closeModals();openAuth()}else{closeModals();showToast('You are already on '+entitlement().name)}return}
     if(!state.user){closeModals();openAuth();byId('authStatus').textContent='Create your free account first, then checkout will attach to it.';return}
+    if(state.revenueCatReady){
+      var rcPackage=revenueCatPackage(plan,state.billing);if(!rcPackage){showToast('RevenueCat offering needs the '+plan+' '+state.billing+' package');return}
+      try{
+        var purchaseResult=nativePlatform?await NativePurchases.purchasePackage({aPackage:rcPackage}):await state.revenueCat.purchase({rcPackage:rcPackage,customerEmail:state.user.email,showDiscountCodeField:true});
+        await refreshRevenueCat(purchaseResult.customerInfo);closeModals();showToast('Purchase verified by RevenueCat — '+entitlement().name+' is active');setTimeout(loadProfile,1200);return;
+      }catch(error){var cancelled=error&&((ErrorCode&&error.errorCode===ErrorCode.UserCancelledError)||error.userCancelled);if(!cancelled){console.warn('RevenueCat purchase failed',error);showToast('Purchase could not be completed — please try again')}return}
+    }
     var priceId=state.config&&state.config.prices?state.config.prices[plan+'_'+state.billing]:'';
     if(!state.paddleReady||!priceId){showToast('Paddle onboarding is the last step before paid checkout goes live');return}
     window.Paddle.Checkout.open({items:[{priceId:priceId,quantity:1}],customer:{email:state.user.email},customData:{supabase_user_id:state.user.id,quotecraft_plan:plan},settings:{displayMode:'overlay',theme:'light',locale:'en',successUrl:location.origin+'/?checkout=success'}});
   }
+
+  async function restorePurchases(){if(!state.user||!state.revenueCatReady){showToast('Sign in after RevenueCat setup to restore purchases');return}try{var result=nativePlatform?await NativePurchases.restorePurchases():{customerInfo:await state.revenueCat.getCustomerInfo()};await refreshRevenueCat(result.customerInfo);showToast(state.revenueCatPlan==='free'?'No active purchase found':'Purchases restored — '+entitlement().name+' is active')}catch(error){showToast('Could not restore purchases')}}
 
   async function openBrands(){if(entitlement().brandProfiles<1){openPricing();showToast('Reusable brands are special to Studio');return}await loadBrands();openModal('brandModal')}
   function renderBrands(){if(!state.brands.length){byId('brandList').innerHTML='<div class="saved-empty"><strong>No brand profiles yet</strong><br><span>Save the identity currently in the editor.</span></div>';return}byId('brandList').innerHTML=state.brands.map(function(brand){return '<article class="brand-card"><span class="brand-swatch" style="background:'+escapeHtml(brand.accent_color)+'"></span><div class="brand-card-info"><strong>'+escapeHtml(brand.name)+'</strong><span>'+escapeHtml(brand.email||'No email')+'</span></div><button class="button small ghost apply-brand" data-id="'+brand.id+'" type="button">Apply</button><button class="button small ghost danger delete-brand" data-id="'+brand.id+'" type="button">Delete</button></article>'}).join('')}
@@ -178,7 +227,7 @@
     byId('copyButton').addEventListener('click',copyQuote);byId('printButton').addEventListener('click',function(){window.print()});byId('savedButton').addEventListener('click',openDrawer);byId('newButton').addEventListener('click',newQuote);byId('pricingButton').addEventListener('click',openPricing);byId('accountButton').addEventListener('click',openAccount);byId('brandPresetButton').addEventListener('click',openBrands);
     document.querySelectorAll('[data-close-drawer]').forEach(function(item){item.addEventListener('click',closeDrawer)});document.querySelectorAll('[data-close-modal]').forEach(function(item){item.addEventListener('click',closeModals)});document.querySelectorAll('[data-open-auth]').forEach(function(item){item.addEventListener('click',function(){closeModals();openAuth()})});document.querySelectorAll('[data-open-pricing]').forEach(function(item){item.addEventListener('click',function(){closeModals();openPricing()})});
     document.querySelectorAll('[data-billing]').forEach(function(item){item.addEventListener('click',function(){setBilling(item.dataset.billing)})});document.querySelectorAll('[data-choose-plan]').forEach(function(item){item.addEventListener('click',function(){choosePlan(item.dataset.choosePlan)})});
-    byId('authForm').addEventListener('submit',signIn);byId('signUpButton').addEventListener('click',signUp);byId('signOutButton').addEventListener('click',signOut);byId('saveBrandButton').addEventListener('click',saveBrand);
+    byId('authForm').addEventListener('submit',signIn);byId('signUpButton').addEventListener('click',signUp);byId('signOutButton').addEventListener('click',signOut);byId('restorePurchasesButton').addEventListener('click',restorePurchases);byId('saveBrandButton').addEventListener('click',saveBrand);
     byId('savedList').addEventListener('click',function(event){var load=event.target.closest('.load-quote');var remove=event.target.closest('.delete-quote');if(load)loadQuoteFromList(load.dataset.id);if(remove)deleteQuote(remove.dataset.id)});
     byId('brandList').addEventListener('click',function(event){var apply=event.target.closest('.apply-brand');var remove=event.target.closest('.delete-brand');if(apply)applyBrand(apply.dataset.id);if(remove)deleteBrand(remove.dataset.id)});
     byId('accentField').addEventListener('click',function(){if(!entitlement().customColor){openPricing();showToast('Custom color is included in Solo and Studio')}});byId('paymentField').addEventListener('click',function(){if(!entitlement().paymentLinks){openPricing();showToast('Client payment buttons are included in Solo and Studio')}});

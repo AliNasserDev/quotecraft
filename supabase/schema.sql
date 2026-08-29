@@ -10,10 +10,19 @@ create table if not exists public.profiles (
   subscription_status text not null default 'inactive',
   paddle_customer_id text unique,
   paddle_subscription_id text unique,
+  revenuecat_store text,
+  revenuecat_product_id text,
+  revenuecat_environment text,
+  revenuecat_last_event text,
   subscription_ends_at timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table public.profiles add column if not exists revenuecat_store text;
+alter table public.profiles add column if not exists revenuecat_product_id text;
+alter table public.profiles add column if not exists revenuecat_environment text;
+alter table public.profiles add column if not exists revenuecat_last_event text;
 
 create table if not exists public.quotes (
   id uuid primary key default gen_random_uuid(),
